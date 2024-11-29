@@ -4,10 +4,11 @@ import os
 import sys
 
 class ROM:
-    def __init__(self, file_name):
+    def __init__(self, rom_path):
+        self.rom_path = rom_path
         self.offsets = None
         print("Reading rom...", end='', flush=True)
-        with open(file_name, "rb") as f:
+        with open(self.rom_path, "rb") as f:
             self.rom = f.read()
         print("done", flush=True)
 
@@ -63,8 +64,32 @@ class ROM:
                 end = self.offsets[o + 1]
                 self._write_sample(o, self.rom[begin:end])
 
-file_name = sys.argv[1]
+    def _zero_out(self, start_address, end_address):
+        with open(self.rom_path, 'r+b') as f:
+            f.seek(start_address)
+            zero_bytes = b'\x00' * (end_address - start_address + 1)
+            f.write(zero_bytes)
+        f.close()
+
+    # remove all music samples, preserves SFX and voices
+    def remove_music(self):
+        music_samples = [
+                                55, 56, 57, 58, 59,
+            60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+            70,
+        ]
+        print("Zeroing out sample", end='', flush=True)
+        for sample in music_samples:
+            print(" %s" % sample, end='', flush=True)
+            # if last sample, zero out until the EOF
+            if sample == len(self.offsets) - 1:
+                self._zero_out(self.offsets[sample], 0x3FFFF0)
+            else:
+                self._zero_out(self.offsets[sample], self.offsets[sample] + 1)
+        print("")
+
+rom_path = sys.argv[1]
 window_size = int(sys.argv[2])
-r = ROM(file_name)
+r = ROM(rom_path)
 r.find_offsets()
-r.write_offsets()
+r.remove_music()
