@@ -5,7 +5,7 @@ To extract audio samples from the rom:
 ```
 For example for `ddpdojblk` I have found a sliding window of 64B to be effective:
 ```
-./search.py cave_m04401b032.u17 64
+./extract-samples.py cave_m04401b032.u17 64
 ```
 The samples will be written to the `samples/` directory. The audio format according to mame 
 is `8 bit mono 11025Hz`, but I was only able to get correct sounding samples when playing at
