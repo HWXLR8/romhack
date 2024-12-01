@@ -4,7 +4,8 @@ import os
 import sys
 
 class ROM:
-    def __init__(self, rom_path):
+    def __init__(self, rom_path, window_size):
+        self.window_size = window_size
         self.rom_path = rom_path
         self.offsets = None
         print("Reading rom...", end='', flush=True)
@@ -13,25 +14,25 @@ class ROM:
         print("done", flush=True)
 
     # returns a list of offsets indicating the beginning of a sample
-    def find_offsets(self, window_size=64):
+    def find_offsets(self):
         print("Searching for samples...", end='', flush=True)
         self.offsets = [0] # start at zero for the first sample
         non_gap = 0
-        non_gap_threshold = 4096
+        non_gap_threshold = 2048
         in_sample = True # we begin in a sample
-        for i in range(len(self.rom) - window_size + 1):
-            window = self.rom[i:i + window_size]
+        for i in range(len(self.rom) - self.window_size + 1):
+            window = self.rom[i:i + self.window_size]
             # check if window only contains 0x00/0xFE/0xFF
             if all(x in (0, 254, 255) for x in window):
                 in_sample = False
                 non_gap = 0
-                continue
             else:
-                if (non_gap == non_gap_threshold) and not in_sample:
-                    in_sample = True
-                    self.offsets.append(i - non_gap_threshold)
-                else:
+                if not in_sample:
                     non_gap += 1
+                    if non_gap == non_gap_threshold:
+                        in_sample = True
+                        self.offsets.append(i - non_gap_threshold)
+
         print("done", flush=True)
         self.num_samples = len(self.offsets)
         print("Found %s samples" % self.num_samples)
@@ -58,7 +59,7 @@ class ROM:
         for o in range(self.num_samples):
             # write until EOF if last sample
             if o == self.num_samples - 1:
-                self._write_sample(o, self.rom[offsets[o]:])
+                self._write_sample(o, self.rom[self.offsets[o]:])
             else:
                 begin = self.offsets[o]
                 end = self.offsets[o + 1]
@@ -90,6 +91,7 @@ class ROM:
 
 rom_path = sys.argv[1]
 window_size = int(sys.argv[2])
-r = ROM(rom_path)
+r = ROM(rom_path, window_size)
 r.find_offsets()
-r.remove_music()
+r.write_samples()
+#r.remove_music()
