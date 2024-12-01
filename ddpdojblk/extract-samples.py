@@ -44,7 +44,7 @@ class ROM:
         with open('offsets', 'w') as file:
             print("Writing offsets to file...", end='', flush=True)
             for offset in self.offsets:
-                file.write(str(offset) + '\n')
+                file.write(str(hex(offset)) + '\n')
             print("done", flush=True)
 
     def _write_sample(self, num, data):
@@ -75,23 +75,29 @@ class ROM:
     # remove all music samples, preserves SFX and voices
     def remove_music(self):
         music_samples = [
-                                55, 56, 57, 58, 59,
+                                35, 36,
             60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
-            70,
+            70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+            80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+            90,
         ]
         print("Zeroing out sample", end='', flush=True)
         for sample in music_samples:
-            print(" %s" % sample, end='', flush=True)
+            start_addr = self.offsets[sample]
+
             # if last sample, zero out until the EOF
             if sample == len(self.offsets) - 1:
-                self._zero_out(self.offsets[sample], 0x3FFFF0)
+                end_adder = 0x3FFFF0
             else:
-                self._zero_out(self.offsets[sample], self.offsets[sample] + 1)
-        print("")
+                end_addr = self.offsets[sample + 1]
+
+            print("zeroing out sample %s: %s -> %s" % (sample, hex(start_addr), hex(end_addr)))
+            self._zero_out(start_addr, end_addr)
 
 rom_path = sys.argv[1]
-window_size = int(sys.argv[2])
+window_size = 32
 r = ROM(rom_path, window_size)
 r.find_offsets()
+r.write_offsets()
 r.write_samples()
-#r.remove_music()
+# r.remove_music()
