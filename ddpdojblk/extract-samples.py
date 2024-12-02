@@ -87,7 +87,7 @@ class ROM:
 
             # if last sample, zero out until the EOF
             if sample == len(self.offsets) - 1:
-                end_adder = 0x3FFFF0
+                end_addr = 0x3FFFF0
             else:
                 end_addr = self.offsets[sample + 1]
 
