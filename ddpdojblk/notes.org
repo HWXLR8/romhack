@@ -1,16 +1,37 @@
 * Memory Mapping
+|-------------------------------+----------+----------|
+| ROM                           |    START |      END |
+|-------------------------------+----------+----------|
+| BIOS (ddp3_bios.u37)          |      0x0 |  0x80000 |
+| PRG ROM (ddb10_10_8_434f.u45) | 0x100000 | 0x200000 |
+| MAIN RAM                      | 0x800000 | 0x81ffff |
+| PALETTE RAM                   | 0xa00000 | 0xa011ff |
+| P1/P2 INPUT                   | 0xc08000 | 0xc08001 |
+|-------------------------------+----------+----------|
 
-|---------------------+----------+----------|
-| ROM                 |    START |      END |
-|---------------------+----------+----------|
-| ddp3_bios.u37       |      0x0 |  0x80000 |
-| ddb10_10_8_434f.u45 | 0x100000 | 0x200000 |
-|---------------------+----------+----------|
+* RAM POI
+|--------------+----------|
+| POINT        |     ADDR |
+|--------------+----------|
+| CREDIT COUNT | 0x80395A |
+| PLAYER INPUT | 0x803970 |
+|--------------+----------|
 
-* PRG ROM
-** Version select
-0x0003c1b2
-** Copyright message...?
-0x0015bbea
-** Warning Screen
-0x00059e58
+** Useful WP for reading when input occurs
+wpset 803970,1,w,wpdata != 0
+
+* PRG ROM POI
+|----------------------------+------------|
+| POINT                      |   ROM ADDR |
+|----------------------------+------------|
+| VERSION SELECT SCREEN      | 0x0003C1B2 |
+| WHITE LABEL WARNING SCREEN | 0x00059E84 |
+| BLACK LABEL WARNING SCREEN | 0x0015AA38 |
+| COPYRIGHT MESSAGE?         |   0x15BBEA |
+|----------------------------+------------|
+
+Each line in the warning message should be terminated by:
+2020 2020 0000 0000 2020 2020
+
+18A58A - compares D0, D1
+13C7E6 - tst.b 803940 == 1, followed by beq
