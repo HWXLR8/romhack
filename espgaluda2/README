@@ -1,0 +1,20 @@
+These tools are for use with the XBOX 360 version of espgaluda 2.
+
+-- audio.py --
+arg: se.bin, located at:
+
+D38939428346F0DE76461C7D1BFDF0A0/res/DISKDATA/SOUND/se.bin
+
+and outputs extracted XMA audio samples. It can also repack those
+samples into a new bin. It's worth noting that the game seems to be ok
+with replacing the XMA samples with PCM WAV. As has been done with
+se.bin in this repo which replaced the shrill shot sound with
+something less harsh.
+
+-- gfx.py --
+arg: *.bin located at:
+
+D38939428346F0DE76461C7D1BFDF0A0/res/DISKDATA/{ARCADE/BL/XB360}/*.bin
+
+and outputs TGA+PNG extracted textures. It can also repack those
+textures into a new bin.
